@@ -1,110 +1,393 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Child Gender Probability Predictor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Genetic Probability Engine 🧬</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
   <style>
-    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 20px; }
-    h1 { text-align: center; }
-    .gen-box { background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 10px; }
-    label { display: block; margin-top: 10px; }
-    input { width: 100px; padding: 5px; margin-top: 5px; }
-    button { padding: 10px 20px; background: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
-    button:hover { background: #0056b3; }
-    #result { background: #e8f0ff; padding: 20px; border-radius: 10px; margin-top: 20px; font-size: 18px; text-align: center; }
-    .optional-note { font-size: 14px; color: #777; }
+    /* CSS Variables for a controlled system aesthetic */
+    :root {
+      --primary-accent: #00e0b7; /* Neon Teal */
+      --secondary-accent: #ff476e; /* Neon Red */
+      --background-color: #121212; /* Dark Mode Base */
+      --card-bg-blur: rgba(255, 255, 255, 0.05); /* Transparent card base */
+      --text-color: #f0f0f0;
+      --subtle-text: #a0a0a0;
+      --border-radius: 10px;
+      --shadow-neo: 0 4px 15px rgba(0, 0, 0, 0.4);
+      --font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: var(--background-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      perspective: 1000px; /* For 3D transforms */
+    }
+
+    /* ---------------------------------- */
+    /* ADVANCED CUBE BACKGROUND ANIMATION */
+    /* ---------------------------------- */
+    .cubes-bg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+        z-index: -1;
+    }
+
+    .cubes-bg div {
+        position: absolute;
+        display: block;
+        width: 20px;
+        height: 20px;
+        background: rgba(0, 224, 183, 0.1); /* Low opacity Neon Teal */
+        animation: animate-cubes 25s linear infinite;
+        bottom: -150px;
+        transform: rotateX(70deg);
+    }
+
+    .cubes-bg div:nth-child(2n) {
+        background: rgba(255, 71, 110, 0.1); /* Low opacity Neon Red */
+    }
+
+    .cubes-bg div:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-duration: 30s; }
+    .cubes-bg div:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-duration: 18s; animation-delay: 2s; }
+    .cubes-bg div:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-duration: 40s; animation-delay: 4s; }
+    .cubes-bg div:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-duration: 25s; }
+    .cubes-bg div:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-duration: 10s; animation-delay: 1s; }
+    .cubes-bg div:nth-child(6) { left: 5%; width: 100px; height: 100px; animation-duration: 35s; animation-delay: 5s; }
+    .cubes-bg div:nth-child(7) { left: 90%; width: 40px; height: 40px; animation-duration: 20s; }
+    .cubes-bg div:nth-child(8) { left: 50%; width: 30px; height: 30px; animation-duration: 15s; animation-delay: 3s; }
+    .cubes-bg div:nth-child(9) { left: 15%; width: 15px; height: 15px; animation-duration: 45s; }
+
+    @keyframes animate-cubes {
+        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(-1000px) rotate(360deg); opacity: 0; }
+    }
+    /* ---------------------------------- */
+
+    .container {
+        max-width: 900px;
+        width: 90%;
+        margin: 40px auto;
+        padding: 20px;
+        z-index: 10;
+    }
+
+    h1 {
+      font-size: 2.8em;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--primary-accent);
+      text-shadow: 0 0 10px rgba(0, 224, 183, 0.6);
+    }
+    h1 i {
+        font-size: 0.8em;
+        margin-right: 10px;
+    }
+
+    /* Glassmorphic Card */
+    .gen-box {
+      background: var(--card-bg-blur);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      margin-bottom: 25px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-neo);
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth cubic transition */
+      transform: translateZ(0); /* Initiate 3D context */
+    }
+    .gen-box:hover {
+        transform: translateZ(5px) scale(1.01);
+        border-color: rgba(0, 224, 183, 0.4);
+    }
+
+    h2 {
+      font-size: 1.4em;
+      font-weight: 600;
+      color: var(--secondary-accent);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 10px;
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+    }
+    h2 i {
+        margin-right: 10px;
+        color: var(--primary-accent);
+    }
+
+    h3 {
+      font-size: 1.0em;
+      color: var(--primary-accent);
+      margin-top: 20px;
+      margin-bottom: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* Input & Label Styling - Focused on data fields */
+    label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+      font-size: 0.95em;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+      color: var(--subtle-text);
+      transition: color 0.3s;
+    }
+    label:hover {
+        color: var(--text-color);
+    }
+    label:last-child { border-bottom: none; }
+
+    input[type="number"] {
+      width: 60px;
+      padding: 6px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--primary-accent);
+      text-align: center;
+      font-family: var(--font-family);
+      font-weight: 600;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input[type="number"]:focus {
+      border-color: var(--primary-accent);
+      outline: none;
+      box-shadow: 0 0 5px var(--primary-accent);
+    }
+
+    /* Button Styling */
+    button {
+      width: 100%;
+      padding: 18px 30px;
+      background: var(--primary-accent);
+      color: var(--background-color);
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-top: 30px;
+      box-shadow: 0 0 20px rgba(0, 224, 183, 0.6);
+      transition: all 0.3s ease-in-out;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transform: translateZ(0);
+    }
+    button:hover {
+      transform: scale(1.02) translateZ(5px);
+      box-shadow: 0 0 30px var(--primary-accent);
+      filter: brightness(1.1);
+    }
+
+    /* Result Box Styling - Sleek Data Readout */
+    #result {
+      background: var(--card-bg-blur);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 30px;
+      border-radius: var(--border-radius);
+      margin-top: 30px;
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-color);
+      box-shadow: var(--shadow-neo);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    .result-show {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+    }
+
+    #result strong {
+        font-size: 1.5em;
+        color: var(--secondary-accent);
+        text-shadow: 0 0 5px rgba(255, 71, 110, 0.5);
+    }
+    
+    .data-row {
+        margin: 15px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .data-label {
+        color: var(--primary-accent);
+        font-size: 1.1em;
+        margin-bottom: 5px;
+        font-weight: 700;
+    }
+
+    .progress-bar-container {
+        width: 80%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50px;
+        height: 15px;
+        margin-top: 5px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        transition: width 1s ease-out;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 5px;
+        font-size: 0.8em;
+        font-weight: 800;
+    }
+    .boy-bar { background: var(--secondary-accent); color: var(--background-color); }
+    .girl-bar { background: var(--primary-accent); color: var(--background-color); }
+
+    .optional-note {
+      font-size: 0.8em;
+      color: var(--subtle-text);
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+        .container { width: 95%; }
+        h1 { font-size: 2em; }
+        .gen-box { padding: 20px; }
+        .gen-box > div { flex-direction: column; }
+        .progress-bar-container { width: 100%; }
+    }
   </style>
 </head>
 <body>
-
-  <h1>👶 Child Gender Probability Predictor (Up to 5 Generations)</h1>
-
-  <!-- GEN 1 -->
-  <div class="gen-box">
-    <h2>Generation 1: Parents (Required)</h2>
-
-    <h3>Father's Side</h3>
-    <label>Father's Brothers (including father himself): <input type="number" id="gen1_father_brothers" min="0"></label>
-    <label>Father's Sisters: <input type="number" id="gen1_father_sisters" min="0"></label>
-
-    <h3>Mother's Side</h3>
-    <label>Mother's Brothers: <input type="number" id="gen1_mother_brothers" min="0"></label>
-    <label>Mother's Sisters (including mother herself): <input type="number" id="gen1_mother_sisters" min="0"></label>
+  
+  <div class="cubes-bg">
+    <div></div><div></div><div></div><div></div><div></div>
+    <div></div><div></div><div></div><div></div>
   </div>
 
-  <!-- GEN 2 -->
-  <div class="gen-box">
-    <h2>Generation 2: Grandparents (Required)</h2>
+  <div class="container">
+    <h1><i class="fas fa-microchip"></i> Genetic Probability Engine</h1>
 
-    <h3>Maternal Side</h3>
-    <label>Maternal Grandfather's Brothers (including himself): <input type="number" id="gen2_mat_gf_bro" min="0"></label>
-    <label>Maternal Grandfather's Sisters: <input type="number" id="gen2_mat_gf_sis" min="0"></label>
-    <label>Maternal Grandmother's Brothers: <input type="number" id="gen2_mat_gm_bro" min="0"></label>
-    <label>Maternal Grandmother's Sisters (including herself): <input type="number" id="gen2_mat_gm_sis" min="0"></label>
+    <div class="gen-box">
+      <h2><i class="fas fa-users-cog"></i> Generation 1: Primary Data Input (Parents)</h2>
 
-    <h3>Paternal Side</h3>
-    <label>Paternal Grandfather's Brothers (including himself): <input type="number" id="gen2_pat_gf_bro" min="0"></label>
-    <label>Paternal Grandfather's Sisters: <input type="number" id="gen2_pat_gf_sis" min="0"></label>
-    <label>Paternal Grandmother's Brothers: <input type="number" id="gen2_pat_gm_bro" min="0"></label>
-    <label>Paternal Grandmother's Sisters (including herself): <input type="number" id="gen2_pat_gm_sis" min="0"></label>
+      <div style="display: flex; gap: 30px;">
+        <div style="flex: 1;">
+          <h3><i class="fas fa-male"></i> Father's Lineage</h3>
+          <label>Brothers (incl. father): <input type="number" id="gen1_father_brothers" min="0" value="0"></label>
+          <label>Sisters: <input type="number" id="gen1_father_sisters" min="0" value="0"></label>
+        </div>
+        <div style="flex: 1;">
+          <h3><i class="fas fa-female"></i> Mother's Lineage</h3>
+          <label>Brothers: <input type="number" id="gen1_mother_brothers" min="0" value="0"></label>
+          <label>Sisters (incl. mother): <input type="number" id="gen1_mother_sisters" min="0" value="0"></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="gen-box">
+      <h2><i class="fas fa-database"></i> Generation 2: Ancestral Data (Grandparents)</h2>
+      <div style="display: flex; gap: 30px;">
+        <div style="flex: 1;">
+          <h3>Maternal Side</h3>
+          <label>Grandfather's Brothers (incl. himself): <input type="number" id="gen2_mat_gf_bro" min="0" value="0"></label>
+          <label>Grandfather's Sisters: <input type="number" id="gen2_mat_gf_sis" min="0" value="0"></label>
+          <label>Grandmother's Brothers: <input type="number" id="gen2_mat_gm_bro" min="0" value="0"></label>
+          <label>Grandmother's Sisters (incl. herself): <input type="number" id="gen2_mat_gm_sis" min="0" value="0"></label>
+        </div>
+        <div style="flex: 1;">
+          <h3>Paternal Side</h3>
+          <label>Grandfather's Brothers (incl. himself): <input type="number" id="gen2_pat_gf_bro" min="0" value="0"></label>
+          <label>Grandfather's Sisters: <input type="number" id="gen2_pat_gf_sis" min="0" value="0"></label>
+          <label>Grandmother's Brothers: <input type="number" id="gen2_pat_gm_bro" min="0" value="0"></label>
+          <label>Grandmother's Sisters (incl. herself): <input type="number" id="gen2_pat_gm_sis" min="0" value="0"></label>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="calculateProbability()"><i class="fas fa-bolt"></i> Execute Analysis</button>
+
+    <div id="result"></div>
   </div>
 
-  <!-- GEN 3 to 5: Optional -->
   <script>
-    const body = document.body;
+    const container = document.querySelector('.container');
+    const button = document.querySelector('button');
+    const resultElement = document.getElementById('result');
+
+    // ------------------------------------
+    // DYNAMIC GENERATION OF OPTIONAL FORMS
+    // ------------------------------------
     for (let g = 3; g <= 5; g++) {
+      const title = g === 3 ? 'Great Grandparents' : g === 4 ? 'Great-Great Grandparents' : 'Deep Ancestral Data';
       const div = document.createElement('div');
       div.className = 'gen-box';
       div.innerHTML = `
-        <h2>Generation ${g}: ${g === 3 ? 'Great Grandparents' : g === 4 ? 'Great-Great Grandparents' : 'Great-Great-Great Grandparents'} (Optional)</h2>
-        <span class="optional-note">Leave blank if unknown or not needed.</span>
+        <h2><i class="fas fa-code-branch"></i> Generation ${g}: ${title} <span class="optional-note">[Optional]</span></h2>
 
-        <h3>Maternal Side</h3>
-        <label>Maternal Grandfather's Brothers (including himself): <input type="number" id="gen${g}_mat_gf_bro" min="0"></label>
-        <label>Maternal Grandfather's Sisters: <input type="number" id="gen${g}_mat_gf_sis" min="0"></label>
-        <label>Maternal Grandmother's Brothers: <input type="number" id="gen${g}_mat_gm_bro" min="0"></label>
-        <label>Maternal Grandmother's Sisters (including herself): <input type="number" id="gen${g}_mat_gm_sis" min="0"></label>
+        <div style="display: flex; gap: 30px;">
+            <div style="flex: 1;">
+                <h3>Maternal</h3>
+                <label>G-Father Brothers (incl. himself): <input type="number" id="gen${g}_mat_gf_bro" min="0" value="0"></label>
+                <label>G-Father Sisters: <input type="number" id="gen${g}_mat_gf_sis" min="0" value="0"></label>
+                <label>G-Mother Brothers: <input type="number" id="gen${g}_mat_gm_bro" min="0" value="0"></label>
+                <label>G-Mother Sisters (incl. herself): <input type="number" id="gen${g}_mat_gm_sis" min="0" value="0"></label>
+            </div>
 
-        <h3>Paternal Side</h3>
-        <label>Paternal Grandfather's Brothers (including himself): <input type="number" id="gen${g}_pat_gf_bro" min="0"></label>
-        <label>Paternal Grandfather's Sisters: <input type="number" id="gen${g}_pat_gf_sis" min="0"></label>
-        <label>Paternal Grandmother's Brothers: <input type="number" id="gen${g}_pat_gm_bro" min="0"></label>
-        <label>Paternal Grandmother's Sisters (including herself): <input type="number" id="gen${g}_pat_gm_sis" min="0"></label>
+            <div style="flex: 1;">
+                <h3>Paternal</h3>
+                <label>G-Father Brothers (incl. himself): <input type="number" id="gen${g}_pat_gf_bro" min="0" value="0"></label>
+                <label>G-Father Sisters: <input type="number" id="gen${g}_pat_gf_sis" min="0" value="0"></label>
+                <label>G-Mother Brothers: <input type="number" id="gen${g}_pat_gm_bro" min="0" value="0"></label>
+                <label>G-Mother Sisters (incl. herself): <input type="number" id="gen${g}_pat_gm_sis" min="0" value="0"></label>
+            </div>
+        </div>
       `;
-      body.insertBefore(div, document.querySelector('button'));
+      container.insertBefore(div, button);
     }
   </script>
 
-  <button onclick="calculateProbability()">Calculate Probability</button>
-
-  <div id="result"></div>
-
   <script>
     function getValue(id) {
-      return parseInt(document.getElementById(id).value) || 0;
+      const element = document.getElementById(id);
+      return element ? (parseInt(element.value) || 0) : 0;
     }
 
     function calculateProbability() {
       let male = 0;
       let female = 0;
 
-      // Gen 1: Parents
+      // Gen 1-5 Logic (Identical to your original logic)
       male += getValue('gen1_father_brothers') + getValue('gen1_mother_brothers');
       female += getValue('gen1_father_sisters') + getValue('gen1_mother_sisters');
 
-      // Gen 2: Grandparents
-      const gen2_ids = [
-        'gen2_mat_gf', 'gen2_mat_gm',
-        'gen2_pat_gf', 'gen2_pat_gm'
-      ];
-      gen2_ids.forEach(id => {
-        male += getValue(`${id}_bro`);
-        female += getValue(`${id}_sis`);
-      });
-
-      // Gen 3–5: Optional
-      for (let g = 3; g <= 5; g++) {
+      for (let g = 2; g <= 5; g++) {
         const ids = [
           `gen${g}_mat_gf`, `gen${g}_mat_gm`,
           `gen${g}_pat_gf`, `gen${g}_pat_gm`
@@ -116,20 +399,43 @@
       }
 
       const total = male + female;
+      resultElement.classList.remove('result-show');
+
       if (total === 0) {
-        document.getElementById('result').innerHTML = `<strong>Please enter at least parent or grandparent values.</strong>`;
+        resultElement.innerHTML = `<strong>ERROR: INITIAL DATA REQUIRED</strong><p style="font-size:0.9em; margin-top:10px;">Please input data for Generation 1 and 2 to execute the genetic analysis.</p>`;
+        setTimeout(() => resultElement.classList.add('result-show'), 10);
         return;
       }
 
-      // Laplace smoothing
+      // Statistical Smoothing (Laplace)
       const pMale = (male + 1) / (total + 2);
       const pFemale = (female + 1) / (total + 2);
+      
+      const boyPercentage = (pMale * 100).toFixed(2);
+      const girlPercentage = (pFemale * 100).toFixed(2);
 
-      document.getElementById('result').innerHTML = `
-        <strong>Predicted Probability:</strong><br>
-        👦 Boy: ${(pMale * 100).toFixed(2)}%<br>
-        👧 Girl: ${(pFemale * 100).toFixed(2)}%
+      // LeetCode-level result presentation: Data visualization bar
+      resultElement.innerHTML = `
+        <strong>ANALYSIS COMPLETE</strong>
+        <p style="font-size:0.9em; margin: 15px 0 25px 0; color: var(--subtle-text);">Based on ${total} data points and statistical smoothing.</p>
+
+        <div class="data-row">
+            <span class="data-label">BOY Probability ♂️</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar boy-bar" style="width: ${boyPercentage}%">${boyPercentage}%</div>
+            </div>
+        </div>
+
+        <div class="data-row">
+            <span class="data-label">GIRL Probability ♀️</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar girl-bar" style="width: ${girlPercentage}%">${girlPercentage}%</div>
+            </div>
+        </div>
       `;
+
+      // Animate result display
+      setTimeout(() => resultElement.classList.add('result-show'), 10);
     }
   </script>
 
